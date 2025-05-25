@@ -13,6 +13,7 @@ This project demonstrates how to monitor memory usage in a NestJS application us
 
 1. Install dependencies:
 ```bash
+cd backend
 nvm use
 npm install
 ```
