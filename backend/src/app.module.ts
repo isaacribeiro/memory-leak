@@ -1,5 +1,6 @@
 import { Module, OnModuleInit } from '@nestjs/common';
 import { GraphQLModule } from '@nestjs/graphql';
+import { ApolloDriver, ApolloDriverConfig } from '@nestjs/apollo';
 import { AppService } from './app.service';
 import { AppResolver } from './app.resolver';
 import { MessageBrokerModule } from './messageBroker/messageBroker.module';
@@ -9,18 +10,13 @@ import { MetricsModule } from './metrics/metrics.module';
 
 @Module({
   imports: [
+    GraphQLModule.forRoot<ApolloDriverConfig>({
+      driver: ApolloDriver,
+      autoSchemaFile: true,
+      installSubscriptionHandlers: true,
+    }),
     MessageBrokerModule,
     MetricsModule,
-    GraphQLModule.forRoot({
-      stopOnTerminationSignals: false,
-      // autoSchemaFile: path.join(process.cwd(), 'src/schema.gql'),
-      autoSchemaFile: true,
-      debug: true,
-      installSubscriptionHandlers: true,
-      subscriptions: {
-        keepAlive: 5000,
-      },
-    }),
   ],
   controllers: [],
   providers: [AppService, AppResolver],
