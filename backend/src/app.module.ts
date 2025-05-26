@@ -7,20 +7,22 @@ import { Inject } from '@nestjs/common';
 import { MessageBrokerProvider } from './messageBroker/messageBroker.providers';
 import { MetricsModule } from './metrics/metrics.module';
 import { AppController } from './app.controller';
+import { ApolloDriver, ApolloDriverConfig } from '@nestjs/apollo';
+import { Context } from 'graphql-ws';
+
 
 @Module({
   imports: [
     MessageBrokerModule,
     MetricsModule,
-    GraphQLModule.forRoot({
+    GraphQLModule.forRoot<ApolloDriverConfig>({
+      driver: ApolloDriver,
+      autoTransformHttpErrors: false,
       stopOnTerminationSignals: false,
       // autoSchemaFile: path.join(process.cwd(), 'src/schema.gql'),
       autoSchemaFile: true,
-      debug: true,
       installSubscriptionHandlers: true,
-      subscriptions: {
-        keepAlive: 5000,
-      },
+      debug: true,
     }),
   ],
   controllers: [AppController],
