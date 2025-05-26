@@ -6,6 +6,7 @@ import { MessageBrokerModule } from './messageBroker/messageBroker.module';
 import { Inject } from '@nestjs/common';
 import { MessageBrokerProvider } from './messageBroker/messageBroker.providers';
 import { MetricsModule } from './metrics/metrics.module';
+import { AppController } from './app.controller';
 
 @Module({
   imports: [
@@ -22,7 +23,7 @@ import { MetricsModule } from './metrics/metrics.module';
       },
     }),
   ],
-  controllers: [],
+  controllers: [AppController],
   providers: [AppService, AppResolver],
 })
 export class AppModule implements OnModuleInit {
@@ -32,12 +33,12 @@ export class AppModule implements OnModuleInit {
   ) {}
 
   onModuleInit() {
-    let count = 1;
-    setInterval(() => {
-      this.sync.redisPubSub.client.publish(
-        'counter',
-        JSON.stringify({ counter: count++ }),
-      );
-    }, 1000);
+    // let count = 1;
+    // setInterval(() => {
+    //   this.sync.redisPubSub.client.publish(
+    //     'counter',
+    //     JSON.stringify({ counter: count++ }),
+    //   );
+    // }, 1000);
   }
 }
