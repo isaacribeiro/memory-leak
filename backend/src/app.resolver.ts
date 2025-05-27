@@ -20,7 +20,6 @@ export class AppResolver {
   @Subscription(() => Int, {
     name: 'counter',
     resolve: (payload) => {
-      console.log(payload);
       return JSON.parse(payload.data).counter;
     },
   })
