@@ -6,30 +6,45 @@ export default function <T, B>(
 ): AsyncIterableIterator<B> {
   const iterator = iterable[Symbol.asyncIterator]();
 
+  let finished = false;
+
+  async function cleanup() {
+    if (!finished && typeof iterator.return === 'function') {
+      finished = true;
+      try {
+        await iterator.return();
+      } catch {
+        // ignore errors during cleanup
+      }
+    }
+  }
+
   return {
     async next() {
-      const { value, done } = await iterator.next();
-      if (done) {
-        return { done: true, value };
-      }
-      return { done: false, value: await func(value) };
-    },
-    async return() {
-      if (iterator.return) {
-        try {
-          const result = await iterator.return();
-          return { done: true, value: result.value as B };
-        } catch (error) {
+      if (finished) return { done: true, value: undefined };
+      try {
+        const { value, done } = await iterator.next();
+        if (done) {
+          await cleanup();
           return { done: true, value: undefined };
         }
+        return { done: false, value: await func(value) };
+      } catch (err) {
+        await cleanup();
+        throw err;
       }
+    },
+    async return() {
+      await cleanup();
       return { done: true, value: undefined };
     },
     async throw(error: any) {
-      if (iterator.throw) {
-        const result = await iterator.throw(error);
-        return { done: true, value: result.value as B };
+      if (typeof iterator.throw === 'function') {
+        try {
+          await iterator.throw(error);
+        } catch {}
       }
+      await cleanup();
       throw error;
     },
     [Symbol.asyncIterator]() {
