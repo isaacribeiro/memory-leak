@@ -5,12 +5,14 @@ count=1
 
 # Function to send the request
 send_request() {
-    curl -X POST http://localhost:3000/publish-counter \
+    response_code=$(curl -X POST http://localhost:3000/publish-counter \
         -H "Content-Type: application/json" \
         -d "{\"counter\": $count}" \
-        -s > /dev/null
+        -w "%{http_code}" \
+        -s \
+        -o /dev/null)
     
-    echo "Published counter: $count"
+    echo "Published counter: $count (Response: $response_code)"
     ((count++))
 }
 
@@ -23,5 +25,5 @@ echo "Sending requests to http://localhost:3000/publish-counter"
 # Main loop
 while true; do
     send_request
-    sleep 1
+    sleep 0.1
 done 
